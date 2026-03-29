@@ -1,49 +1,100 @@
 #include <stdio.h>
 #include <string.h>
 #include "utils.h"
+#include "trie.h"
+#include "suffix_tree.h"
 
 #define MAX_SEQ 1000
+#define MAX_DATASET 100
+
+TrieNode* trie_root = NULL;
+
+// Store dataset in memory
+char dataset[MAX_DATASET][MAX_SEQ];
+int dataset_size = 0;
 
 void show_menu() {
     printf("\n==== DNA Matching System ====\n");
     printf("1. Load Sample Data\n");
-    printf("2. Enter DNA Sequence\n");
-    printf("3. Validate Sequence\n");
+    printf("2. Enter Query DNA Sequence\n");
+    printf("3. Validate Query\n");
     printf("4. Exit\n");
+    printf("5. Search Exact Match (Trie)\n");
+    printf("6. Search Pattern (Suffix Tree)\n");
     printf("Choose an option: ");
+}
+
+// Load file and store sequences
+void load_and_store(const char* filename) {
+    FILE* file = fopen(filename, "r");
+    if (!file) {
+        printf("Error opening %s\n", filename);
+        return;
+    }
+
+    char line[MAX_SEQ];
+
+    while (fgets(line, sizeof(line), file)) {
+        line[strcspn(line, "\n")] = 0;
+
+        // Skip labels
+        if (line[0] == '>') continue;
+
+        normalize_sequence(line);
+
+        if (!validate_sequence(line)) continue;
+
+        // Store in dataset
+        strcpy(dataset[dataset_size], line);
+        dataset_size++;
+
+        // Insert into Trie
+        insert_sequence(trie_root, line);
+    }
+
+    fclose(file);
 }
 
 int main() {
     int choice;
-    char sequence[MAX_SEQ];
+    char query[MAX_SEQ];
 
     while (1) {
         show_menu();
         scanf("%d", &choice);
-        getchar(); // consume newline
+        getchar();
 
         switch (choice) {
 
             case 1:
-                printf("\nLoading sample data...\n");
-                load_sample_data("data/human.txt");
-                load_sample_data("data/chimpanzee.txt");
-                load_sample_data("data/mouse.txt");
-                load_sample_data("data/virus_strain_a.txt");
-                load_sample_data("data/virus_strain_b.txt");
+                printf("\nLoading dataset...\n");
+
+                // Reset
+                dataset_size = 0;
+
+                if (trie_root) free_trie(trie_root);
+                trie_root = create_trie();
+
+                load_and_store("data/human.txt");
+                load_and_store("data/chimpanzee.txt");
+                load_and_store("data/mouse.txt");
+                load_and_store("data/virus_strain_a.txt");
+                load_and_store("data/virus_strain_b.txt");
+
+                printf("Dataset loaded: %d sequences\n", dataset_size);
                 break;
 
             case 2:
-                printf("\nEnter DNA sequence: ");
-                fgets(sequence, MAX_SEQ, stdin);
-                sequence[strcspn(sequence, "\n")] = 0;
+                printf("\nEnter DNA query: ");
+                fgets(query, MAX_SEQ, stdin);
+                query[strcspn(query, "\n")] = 0;
 
-                normalize_sequence(sequence);
-                printf("Normalized Sequence: %s\n", sequence);
+                normalize_sequence(query);
+                printf("Normalized Query: %s\n", query);
                 break;
 
             case 3:
-                if (validate_sequence(sequence)) {
+                if (validate_sequence(query)) {
                     printf("Valid DNA sequence.\n");
                 } else {
                     printf("Invalid DNA sequence.\n");
@@ -53,6 +104,47 @@ int main() {
             case 4:
                 printf("Exiting...\n");
                 return 0;
+
+            case 5:
+                if (!trie_root) {
+                    printf("Load dataset first.\n");
+                    break;
+                }
+
+                if (search_sequence(trie_root, query)) {
+                    printf("Exact sequence FOUND in dataset.\n");
+                } else {
+                    printf("Exact sequence NOT found.\n");
+                }
+                break;
+
+            case 6: {
+                if (dataset_size == 0) {
+                    printf("Load dataset first.\n");
+                    break;
+                }
+
+                int found = 0;
+
+                printf("Searching pattern across dataset...\n");
+
+                for (int i = 0; i < dataset_size; i++) {
+                    build_suffix_tree(dataset[i]);
+
+                    if (search_pattern(query)) {
+                        printf("Pattern found in sequence %d\n", i + 1);
+                        found = 1;
+                    }
+
+                    free_suffix_tree();
+                }
+
+                if (!found) {
+                    printf("Pattern NOT found in dataset.\n");
+                }
+
+                break;
+            }
 
             default:
                 printf("Invalid choice.\n");
