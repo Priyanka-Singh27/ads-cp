@@ -3,6 +3,7 @@
 #include "utils.h"
 #include "trie.h"
 #include "suffix_tree.h"
+#include "skiplist.h"
 
 #define MAX_SEQ 1000
 #define MAX_DATASET 100
@@ -21,6 +22,7 @@ void show_menu() {
     printf("4. Exit\n");
     printf("5. Search Exact Match (Trie)\n");
     printf("6. Search Pattern (Suffix Tree)\n");
+    printf("7. Rank Matches (Skip List)\n");
     printf("Choose an option: ");
 }
 
@@ -53,6 +55,22 @@ void load_and_store(const char* filename) {
     }
 
     fclose(file);
+}
+
+int calculate_similarity(const char* seq, const char* query) {
+    
+    int match = 0;
+    int len1 = strlen(seq);
+    int len2 = strlen(query);
+    int min = len1 < len2 ? len1 : len2;
+    if (min == 0) return 0;
+
+    for (int i = 0; i < min; i++) {
+        if (seq[i] == query[i]) {
+            match++;
+        }
+    }
+    return (match * 100) / min; // percentage
 }
 
 int main() {
@@ -145,7 +163,33 @@ int main() {
 
                 break;
             }
+            case 7: {
+                if (dataset_size == 0) {
+                    printf("Load dataset first.\n");
+                    break;
+                }
 
+                if (!validate_sequence(query)) {
+                    printf("Enter a valid query first.\n");
+                    break;
+                }
+                
+                // Clear previous skip list
+                free_skiplist();
+                init_skiplist();   // 🔥 MUST
+                printf("Calculating similarity scores...\n");
+
+                for (int i = 0; i < dataset_size; i++) {
+                    if (strlen(dataset[i]) == 0) continue;
+                    int score = calculate_similarity(dataset[i], query);
+                    printf("Seq %d Score: %d\n", i, score);  // debug
+                    if (score > 0) {
+                        insert_skiplist(dataset[i], score);
+                    }
+                }
+                display_top_matches(5); // Top 5 matches
+                break;
+            }
             default:
                 printf("Invalid choice.\n");
         }

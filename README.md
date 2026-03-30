@@ -204,4 +204,9 @@ Each member must implement ONE module.
 
 ```bash
 gcc src/*.c -Iinclude -o dna_app
-./dna_app
+./dna_app 
+```
+OR
+```
+dna_app
+```

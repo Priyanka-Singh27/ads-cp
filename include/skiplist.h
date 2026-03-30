@@ -10,5 +10,6 @@ typedef struct SkipNode {
 void insert_skiplist(const char* seq, int score);
 void display_top_matches(int k);
 void free_skiplist();
+void init_skiplist();
 
 #endif
