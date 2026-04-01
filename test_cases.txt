@@ -1,0 +1,173 @@
+==============================
+DNA MATCHING SYSTEM - DEMO TESTS
+==============================
+
+NOTE:
+- Enter inputs exactly as shown
+- Run step-by-step for best demo
+
+--------------------------------
+TEST 1: Load Dataset
+--------------------------------
+Input:
+1
+
+Expected:
+Dataset loaded successfully
+
+
+--------------------------------
+TEST 2: Exact Match (Trie)
+--------------------------------
+Input:
+2
+ATGGTGCACCTGACTCCTGAGGAGAAGTCTGCCGTTACTGCCCTGTGGGGCAAGGTGAACGTGGATGAAGTTGGTGGTGAGGCCCTGGGCAG
+5
+
+Expected:
+Exact sequence FOUND in dataset.
+
+
+--------------------------------
+TEST 3: One Mutation (Alignment)
+--------------------------------
+Input:
+2
+ATGGTGCACCTGACTCCTGAGGAGAAGTCTGCCGTTACTGCCCTGTGGGGCAAGGTGAACGTGGATGAAGTTGGTGGTGAGGCCCTGGGCAA
+5
+
+Expected:
+Exact sequence NOT found
+Needleman-Wunsch alignment shown
+High score (~85–95)
+One mismatch visible
+
+
+--------------------------------
+TEST 4: Substring Search (Suffix Tree)
+--------------------------------
+Input:
+2
+CCTGAGGAGAAGTCTGCC
+6
+
+Expected:
+Pattern found in:
+Human (Human_HBB_1)
+
+
+--------------------------------
+TEST 5: Ranking - TP53 Gene
+--------------------------------
+Input:
+2
+ATGGAGGAGCCGCAGTCAGATCCTAGCGTCGAGCCCCCTCTGAGTCAGGAAACATTTTCAGACCTATGGAAACTACTTCCTGAAAACA
+7
+
+Expected:
+Top match:
+Human (Human_TP53_1)
+
+
+--------------------------------
+TEST 6: Ranking - INS Gene
+--------------------------------
+Input:
+2
+ATGCCCTGTGGATGCGCTTCCTGCCCCTGCTGGCGCTGCTGGCGCTGCTGGCGCTGCTGGCGCTGCTGGCGCTGCTGGCGCTGCTGGC
+7
+
+Expected:
+Top match:
+Human (Human_INS_1)
+
+
+--------------------------------
+TEST 7: Partial Query (Hash + Alignment)
+--------------------------------
+Input:
+2
+ATGCCACCCCTAACAGTTACATAGTTACATAAAGC
+7
+
+Expected:
+Top match:
+Human (Human_MTND1_1)
+Medium/High score
+
+
+--------------------------------
+TEST 8: Invalid Input
+--------------------------------
+Input:
+2
+ATXG123
+3
+
+Expected:
+Invalid DNA sequence
+
+
+--------------------------------
+TEST 9: No Match Case
+--------------------------------
+Input:
+2
+TTTTTTTTTTTT
+6
+7
+
+Expected:
+Pattern NOT found
+No matches OR very low scores
+
+
+--------------------------------
+TEST 10: Short Query (Edge Case)
+--------------------------------
+Input:
+2
+ATG
+7
+
+Expected:
+Hash filter skipped
+Results still shown
+
+
+--------------------------------
+TEST 11: Stability Test (Multiple Queries)
+--------------------------------
+Input:
+1
+2
+ATGGAGGAGCCG
+7
+2
+ATGCCCTGTGG
+7
+2
+ATGGTGCACC
+7
+
+Expected:
+No crashes
+Different results each time
+
+
+--------------------------------
+FINAL DEMO (USE THIS)
+--------------------------------
+Input:
+1
+2
+ATGGAGGAGCCGCAGTCAGATCCTAGCGTCGAGCCCCCTCTGAGTCAGGAAACATTTTCAGACCTATGGAAACTACTTCCTGAAAACA
+7
+
+Expected:
+Top match:
+Human (TP53 gene)
+
+--------------------------------
+END OF TEST FILE
+--------------------------------
